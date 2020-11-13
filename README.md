@@ -1,4 +1,4 @@
-# analytics--sample
+# analytics-sample
 
 ## Project setup
 ```
