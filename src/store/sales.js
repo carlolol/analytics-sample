@@ -21,11 +21,31 @@ store.registerModule('sales', {
     getSalesByBranchId: state => branchId => {
       return state.sales.filter(sales => sales.branchId === branchId)
     },
+    getTotalSalesByBranchId: (state, getters) => branchId => {
+      return getters.getSalesByBranchId(branchId).reduce((acc, curr) => (acc += curr.amount), 0)
+    },
+    getSalesByType: state => type => {
+      return state.sales.filter(sales => sales.type === type)
+    },
+    getLifetimeSalesTotal (state, getters) {
+      return getters.getSalesByType('sales').reduce((acc, curr) => (acc += curr.amount), 0)
+    },
+    getRevenueSalesTotal (state, getters) {
+      return getters.getSalesByType('revenue').reduce((acc, curr) => (acc += curr.amount), 0)
+    },
+    getAverageOrderValue (state) {
+      return state.sales.reduce((acc, curr) => (acc += curr.amount), 0)
+    },
     getSalesByBranchIdAndType: state => (branchId, type) => {
       return state.sales.filter(sales => sales.branchId === branchId && sales.type === type)
     },
-    getAggregatedSales: state => (from, to, branchId, type) => {
-      const aggregatedSales = state.sales.reduce((acc, sale) => {
+    getSalesSortedByDate ({ sales }) {
+      return sales.sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt)
+      })
+    },
+    getAggregatedSales: (state, getters) => (from, to, branchId, type) => {
+      const aggregatedSales = getters.getSalesSortedByDate.reduce((acc, sale) => {
         const date = sale.createdAt.substring(0, 10)
 
         // Skip item that is out of range
@@ -36,18 +56,14 @@ store.registerModule('sales', {
         if (type && type !== sale.type) return acc
 
         if (date in acc) {
-          if (sale.type in acc[date]) {
-            acc[date][sale.type] += sale.amount
-          } else {
-            acc[date][sale.type] = sale.amount
-          }
+          acc[date][sale.type] += sale.amount
         } else {
-          acc[date] = {}
+          acc[date] = { sales: 0, revenue: 0 }
           acc[date][sale.type] = sale.amount
         }
 
         return acc
-      }, [{}])
+      }, {})
 
       return aggregatedSales
     }
@@ -59,14 +75,16 @@ store.registerModule('sales', {
      */
     generateSales (ctx, branchId) {
       const sales = []
-      const amount = Math.floor(Math.random() * 200)
+      const length = Math.floor(Math.random() * 200)
 
-      for (let i = 0; i < amount; i++) {
+      for (let i = 0; i < length; i++) {
         sales.push({
           id: faker.random.uuid(),
           type: Math.floor(Math.random() * 2) ? 'sales' : 'revenue',
           branchId,
-          createdAt: Math.floor(Math.random() * 2) ? faker.date.recent(0) : faker.date.past(),
+          createdAt: Math.floor(Math.random() * 10)
+            ? faker.date.past().toISOString()
+            : faker.date.recent(0).toISOString(),
           amount: Math.floor(Math.random() * 10) * 1000
         })
       }

@@ -20,7 +20,9 @@ const generateUsers = (amount) => {
       uuid: faker.random.uuid(),
       username: faker.internet.userName(),
       fullname: faker.name.findName(),
-      createdAt: Math.floor(Math.random() * 2) ? faker.date.recent(0) : faker.date.past()
+      createdAt: Math.floor(Math.random() * 2)
+        ? faker.date.recent(0).toISOString()
+        : faker.date.past().toISOString()
     })
   }
   return users
@@ -30,7 +32,7 @@ store.registerModule('user', {
   namespaced: true,
   state: {
     /** @type {User[]} */
-    users: generateUsers(285)
+    users: generateUsers(Math.floor(Math.random() * 300))
   },
   getters: {
     getDailyAverage ({ users }) {
@@ -43,8 +45,9 @@ store.registerModule('user', {
         }
 
         return acc
-      }, [{}])
-      return reducedDates.reduce((acc, date) => (acc += Object.keys(date)[0]), 0) / reducedDates.length
+      }, {})
+      const keys = Object.keys(reducedDates)
+      return keys.reduce((acc, key) => (acc += reducedDates[key]), 0) / keys.length
     }
   },
   actions: { },

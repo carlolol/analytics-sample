@@ -16,7 +16,16 @@ store.registerModule('reward', {
     /** @type {Reward[]} rewards */
     rewards: []
   },
-  getters: { },
+  getters: {
+    getTotalRewards: state => (onlyRedeemed) => {
+      return state.rewards.reduce((acc, curr) => {
+        if (onlyRedeemed && !curr.redeemedAt) return acc
+
+        acc += curr.amount
+        return acc
+      }, 0)
+    }
+  },
   actions: {
     generateRewards (ctx) {
       const reward = []
@@ -26,8 +35,8 @@ store.registerModule('reward', {
         const createdAt = Math.floor(Math.random() * 2) ? faker.date.recent(0) : faker.date.past()
         reward.push({
           id: faker.random.uuid(),
-          createdAt,
-          redeemedAt: Math.floor(Math.random() * 2) ? faker.date.future(0, createdAt) : '',
+          createdAt: createdAt.toISOString(),
+          redeemedAt: Math.floor(Math.random() * 2) ? faker.date.future(0, createdAt).toISOString() : '',
           amount: Math.floor(Math.random() * 10) * 1000
         })
       }
