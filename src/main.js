@@ -5,6 +5,7 @@ import router from './router'
 
 // plugins
 import vuetify from './plugins/vuetify'
+import './plugins/apexcharts'
 
 // mixins
 import './mixins'
