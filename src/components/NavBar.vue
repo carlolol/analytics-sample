@@ -2,7 +2,6 @@
   div
     v-app-bar(
       app
-      flat
       elevate-on-scroll
       color="white"
     )
@@ -17,7 +16,7 @@
             v-on="on"
             v-bind="attrs"
             text
-          ).pr-5
+          ).pr-2
             v-avatar(color="rgb(224,232,242)" size="38")
               v-icon(color="white") mdi-account
             span.px-5 {{ loggedInUser.fullname }}
@@ -26,7 +25,7 @@
           v-list-item
             v-list-item-title Logout
       v-divider(inset vertical)
-      v-btn(icon small).ml-5.mr-7
+      v-btn(icon small).ml-2.mr-3
         v-badge(
           overlap
           color="orange"
@@ -34,9 +33,10 @@
         )
           v-icon mdi-bell-outline
       v-divider(inset vertical)
-      v-icon.px-5 mdi-comment-question-outline
+      v-icon.px-2 mdi-comment-question-outline
     v-navigation-drawer(
       v-model="showSideBar"
+      floating
       :clipped="!$isSmallAndDown"
       :app="!$isSmallAndDown"
       :fixed="$isSmallAndDown"
